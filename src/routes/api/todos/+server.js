@@ -4,9 +4,9 @@ import { json } from '@sveltejs/kit';
 
 export async function POST({ request }) {
 	const { title } = await request.json();
-	const [id] = await db.insert(todos).values({ title });
+	const todo = await db.insert(todos).values({ title }).returning();
 
-	return json({ id }, { status: 201 });
+	return json({ ...todo[0]}, { status: 201 });
 }
 
 

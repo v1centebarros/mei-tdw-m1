@@ -23,6 +23,7 @@
 		"@types/better-sqlite3": "^7.6.10",
 		"@types/eslint": "^9.6.0",
 		"autoprefixer": "^10.4.20",
+		"daisyui": "^4.12.13",
 		"drizzle-kit": "^0.22.0",
 		"eslint": "^9.0.0",
 		"eslint-config-prettier": "^9.1.0",
