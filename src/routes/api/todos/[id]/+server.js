@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 export async function GET({ request }) {
 	const { id } = request.searchParams;
 	if (id) {
-		const todo = db.select().from(todos).where({ id }).first();
+		const todo = db.select().from(todos).where(eq(todos.id, id)).limit(1);
 		return json(todo);
 	}
 
@@ -14,13 +14,16 @@ export async function GET({ request }) {
 	return json(allTodos);
 }
 
-
 export async function PATCH({ request, params }) {
 	const { id } = params;
 	const { completed } = await request.json();
 
-	const updatedTodo= await db.update(todos).set({  completed: + completed  }).where(eq(todos.id, id)).returning();
-	return json({...updatedTodo[0]});
+	const updatedTodo = await db
+		.update(todos)
+		.set({ completed: +completed })
+		.where(eq(todos.id, id))
+		.returning();
+	return json({ ...updatedTodo[0] });
 }
 
 export async function DELETE({ params }) {
