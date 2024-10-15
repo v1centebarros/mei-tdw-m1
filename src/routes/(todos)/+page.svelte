@@ -42,7 +42,7 @@
 	}
 </script>
 
-<h1 class="pt-4 text-center text-5xl font-bold">Todo App</h1>
+<h1 class="pt-4 text-center text-5xl font-bold">Todo App Svelte</h1>
 <div class="divider"></div>
 {#if data.todos.length <= 0}
 	<p class="text-center text-xl font-bold">Start By Typing your first TODO</p>
