@@ -5,5 +5,5 @@ export async function load() {
 	const allTodos = db.select().from(todos).all();
 	return {
 		todos: allTodos
-	}
+	};
 }
