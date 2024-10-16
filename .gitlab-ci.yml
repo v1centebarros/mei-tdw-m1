@@ -15,3 +15,13 @@ sonarcloud-check:
     - merge_requests
     - main
     - develop
+
+run-tests:
+  script:
+    - echo "Running tests"
+    - npm install
+    - npm test
+  only:
+    - merge_requests
+    - main
+    - develop
