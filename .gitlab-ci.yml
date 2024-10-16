@@ -17,6 +17,8 @@ sonarcloud-check:
     - develop
 
 run-tests:
+  image:
+    name: node:20
   script:
     - echo "Running tests"
     - npm install
