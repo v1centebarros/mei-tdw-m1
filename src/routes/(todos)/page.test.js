@@ -6,6 +6,7 @@ import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 import userEvent from '@testing-library/user-event';
 
+/** @type {{ todos: { id: number; title: string; completed: boolean; }[] }} */
 let data;
 
 const server = setupServer(

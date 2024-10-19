@@ -3,8 +3,9 @@ import { json } from '@sveltejs/kit';
 import { todos } from '$lib/server/db/schema.js';
 import { eq } from 'drizzle-orm';
 
-export async function GET({ request }) {
-	const { id } = request.searchParams;
+/** @type {import('@sveltejs/kit').RequestHandler}*/
+export async function GET({ params }) {
+	const { id } = params;
 	if (id) {
 		const todo = db.select().from(todos).where(eq(todos.id, id)).limit(1);
 		return json(todo);
@@ -14,6 +15,7 @@ export async function GET({ request }) {
 	return json(allTodos);
 }
 
+/** @type {import('@sveltejs/kit').RequestHandler} */
 export async function PATCH({ request, params }) {
 	const { id } = params;
 	const { completed } = await request.json();
@@ -26,6 +28,7 @@ export async function PATCH({ request, params }) {
 	return json({ ...updatedTodo[0] });
 }
 
+/** @type {import('@sveltejs/kit').RequestHandler} */
 export async function DELETE({ params }) {
 	const { id } = params;
 	const response = await db.delete(todos).where(eq(todos.id, id)).returning();

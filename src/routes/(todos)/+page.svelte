@@ -2,7 +2,9 @@
 	export let data;
 
 	let inputTodo = '';
-
+	/** @param {number} id
+	 * 	@returns {Promise<void>}
+	 * */
 	async function deleteTodo(id) {
 		const res = await fetch(`/api/todos/${id}`, {
 			method: 'DELETE'
@@ -10,6 +12,9 @@
 		if (res.ok) data.todos = data.todos.filter((todo) => todo.id !== id);
 	}
 
+	/** @param {string} title
+	 * 	@returns {Promise<void>}
+	 * */
 	async function addTodo(title) {
 		const res = await fetch('/api/todos', {
 			method: 'POST',
@@ -26,6 +31,10 @@
 		}
 	}
 
+	/** @param {number} id
+	 * 	@param {boolean} completed
+	 * 	@returns {Promise<void>}
+	 * */
 	async function updateTodoStatus(id, completed) {
 		const res = await fetch(`/api/todos/${id}`, {
 			method: 'PATCH',
@@ -53,7 +62,7 @@
 				<div class="flex items-center gap-x-2">
 					<input
 						type="checkbox"
-						checked={todo.completed}
+						checked={!!todo.completed}
 						on:change={(e) => updateTodoStatus(todo.id, e.target.checked)}
 						class="checkbox-accent checkbox"
 					/>

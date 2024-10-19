@@ -2,6 +2,7 @@ import { todos } from '$lib/server/db/schema.js';
 import { db } from '$lib/server/db/index.js';
 import { json } from '@sveltejs/kit';
 
+/** @type {import('@sveltejs/kit').RequestHandler} */
 export async function POST({ request }) {
 	const { title } = await request.json();
 	const todo = await db.insert(todos).values({ title }).returning();
