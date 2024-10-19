@@ -9,12 +9,16 @@ export default [
 	...svelte.configs['flat/recommended'],
 	prettier,
 	...svelte.configs['flat/prettier'],
+
 	{
 		languageOptions: {
 			globals: {
 				...globals.browser,
 				...globals.node
 			}
+		},
+		rules: {
+			'svelte/no-at-html-tags': 'off'
 		}
 	},
 	{

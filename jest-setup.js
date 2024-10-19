@@ -1,11 +1,11 @@
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom';
 
 export default {
 	transform: {
-		'^.+\\.svelte$': 'svelte-jester',
+		'^.+\\.svelte$': 'svelte-jester'
 	},
 	moduleFileExtensions: ['js', 'svelte'],
 	extensionsToTreatAsEsm: ['.svelte'],
 	testEnvironment: 'jsdom',
-	setupFilesAfterEnv: ['<rootDir>/jest-setup.js'],
-}
+	setupFilesAfterEnv: ['<rootDir>/jest-setup.js']
+};

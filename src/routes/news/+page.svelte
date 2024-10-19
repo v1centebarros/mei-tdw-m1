@@ -6,9 +6,15 @@
 
 {#each data.news as news}
 	<div class="mx-2 flex items-center justify-between">
-		<div class="flex items
-		-center gap-x-2">
-			<img src={`https://mei-tdw-m1.pockethost.io/${news.image}`} alt={news.title} class="w-20 h-20 object-cover rounded-lg" />
+		<div
+			class="items -center
+		flex gap-x-2"
+		>
+			<img
+				src={`https://mei-tdw-m1.pockethost.io/${news.image}`}
+				alt={news.title}
+				class="h-20 w-20 rounded-lg object-cover"
+			/>
 			<span class="text-xl font-light">{news.title}</span>
 		</div>
 		<span class="text-sm font-light">{news.date}</span>
