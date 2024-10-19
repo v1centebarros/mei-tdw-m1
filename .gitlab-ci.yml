@@ -10,7 +10,8 @@ sonarcloud-check:
     paths:
       - .sonar/cache
   script:
-    - sonar-scanner
+    - sonar-scanner -Dsonar.projectKey=v1centebarros_mei-tdw-m1 -Dsonar.organization=v1centebarros-gitlab
+
   only:
     - merge_requests
     - main
