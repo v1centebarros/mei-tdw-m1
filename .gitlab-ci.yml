@@ -1,20 +1,6 @@
 variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
   GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
-sonarcloud-check:
-  image:
-    name: sonarsource/sonar-scanner-cli:latest
-    entrypoint: [""]
-  cache:
-    key: "${CI_JOB_NAME}"
-    paths:
-      - .sonar/cache
-  script:
-    - sonar-scanner -Dsonar.projectKey=v1centebarros_mei-tdw-m1 -Dsonar.organization=v1centebarros-gitlab -Dproject.settings=sonar-project.properties
-  only:
-    - merge_requests
-    - main
-    - develop
 
 run-tests:
   image:
@@ -29,10 +15,26 @@ run-tests:
     - develop
 
 
-default:
-  image: node:20
+sonarcloud-check:
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  dependencies:
+    - run-tests
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - sonar-scanner -Dsonar.projectKey=v1centebarros_mei-tdw-m1 -Dsonar.organization=v1centebarros-gitlab -Dproject.settings=sonar-project.properties
+  only:
+    - merge_requests
+    - main
+    - develop
+
 
 deploy_preview:
+  image: node:20
   stage: deploy
   only:
     - dev
@@ -43,6 +45,7 @@ deploy_preview:
     - vercel deploy --prebuilt  --token=$VERCEL_TOKEN
 
 deploy_production:
+  image: node:20
   stage: deploy
   only:
     - main
