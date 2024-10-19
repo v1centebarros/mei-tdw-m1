@@ -104,6 +104,8 @@
 	/>
 	<button
 		class={`btn join-item bg-gradient-to-r from-orange-600 from-10% via-pink-800 via-40% to-purple-800 to-90% text-white disabled:text-white ${!inputTodo && 'btn-disabled'}`}
-		on:click={async () => await addTodo(inputTodo)}>Add Todo
+		on:click={async () => await addTodo(inputTodo)}
+		disabled={!inputTodo}
+	>Add Todo
 	</button>
 </div>
