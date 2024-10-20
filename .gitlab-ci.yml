@@ -38,7 +38,7 @@ run_typecheck:
       - node_modules/
   script:
     - echo "Running type checks"
-    - npm run typecheck
+    - npm run check
   artifacts:
     paths:
       - node_modules/
@@ -91,7 +91,7 @@ sonarcloud_check:
   stage: sonar
   image:
     name: sonarsource/sonar-scanner-cli:latest
-    entrypoint: [""]
+    entrypoint: ['']
   dependencies:
     - run_tests
   cache:
