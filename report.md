@@ -7,11 +7,11 @@ Furthermore, there is a news page that fetches data from a CMS API and displays 
 
 ## Features
 
-    - [x] **View Todos**: A page to view all the todos.
-    - [x] **Add Todo**: A form to add a new todo.
-    - [x] **Delete Todo**: A button to delete a todo.
-    - [x] **Mark Todo as Done**: A button to mark a todo as done.
-    - [x] **View News**: A page to view the news.
+- [x] **View Todos**: A page to view all the todos.
+- [x] **Add Todo**: A form to add a new todo.
+- [x] **Delete Todo**: A button to delete a todo.
+- [x] **Mark Todo as Done**: A button to mark a todo as done.
+- [x] **View News**: A page to view the news.
 
 ## Tech Stack
 
