@@ -4,7 +4,6 @@ variables:
 
 stages:
   - install
-  - build
   - test
   - sonar
   - deploy
@@ -28,17 +27,14 @@ install_dependencies:
     - dev
     - develop
 
-build_app:
-  stage: build
+run_typecheck:
+  stage: test
   image: node:20
   dependencies:
     - install_dependencies
   script:
-    - echo "Building the application"
-    - npm run build
-  artifacts:
-    paths:
-      - build/
+    - echo "Running type checks"
+    - npm run typecheck
   only:
     - merge_requests
     - main
@@ -49,10 +45,10 @@ run_lint:
   stage: test
   image: node:20
   dependencies:
-    - build_app
+    - run_typecheck
   script:
     - echo "Running lint checks"
-    - npm run check
+    - npm run lint
   only:
     - merge_requests
     - main
@@ -94,11 +90,10 @@ sonarcloud_check:
     - develop
 
 deploy_preview:
-  image: node:20
   stage: deploy
   image: node:20
   dependencies:
-    - build_app
+    - run_tests
   script:
     - echo "Deploying to preview site"
     - npm install --global vercel
@@ -109,11 +104,10 @@ deploy_preview:
     - dev
 
 deploy_production:
-  image: node:20
   stage: deploy
   image: node:20
   dependencies:
-    - build_app
+    - run_tests
   script:
     - echo "Deploying to production"
     - npm install --global vercel
