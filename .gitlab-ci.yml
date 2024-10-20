@@ -32,9 +32,16 @@ run_typecheck:
   image: node:20
   dependencies:
     - install_dependencies
+  cache:
+    key: npm-cache
+    paths:
+      - node_modules/
   script:
     - echo "Running type checks"
     - npm run typecheck
+  artifacts:
+    paths:
+      - node_modules/
   only:
     - merge_requests
     - main
@@ -46,9 +53,16 @@ run_lint:
   image: node:20
   dependencies:
     - run_typecheck
+  cache:
+    key: npm-cache
+    paths:
+      - node_modules/
   script:
     - echo "Running lint checks"
     - npm run lint
+  artifacts:
+    paths:
+      - node_modules/
   only:
     - merge_requests
     - main
@@ -60,6 +74,10 @@ run_tests:
   image: node:20
   dependencies:
     - run_lint
+  cache:
+    key: npm-cache
+    paths:
+      - node_modules/
   script:
     - echo "Running tests"
     - npm test
@@ -94,6 +112,10 @@ deploy_preview:
   image: node:20
   dependencies:
     - run_tests
+  cache:
+    key: npm-cache
+    paths:
+      - node_modules/
   script:
     - echo "Deploying to preview site"
     - npm install --global vercel
@@ -108,6 +130,10 @@ deploy_production:
   image: node:20
   dependencies:
     - run_tests
+  cache:
+    key: npm-cache
+    paths:
+      - node_modules/
   script:
     - echo "Deploying to production"
     - npm install --global vercel
