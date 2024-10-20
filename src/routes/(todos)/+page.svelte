@@ -64,7 +64,10 @@
 					<input
 						type="checkbox"
 						checked={!!todo.completed}
-						on:change={(e) => updateTodoStatus(todo.id, e.target.checked)}
+						on:click={(e) => {
+							const target = /** @type {HTMLInputElement} */ (e.target);
+							updateTodoStatus(todo.id, target.checked);
+						}}
 						class="checkbox-accent checkbox"
 					/>
 					<span class={`text-xl font-light ${todo.completed && 'line-through'}`}>{todo.title}</span>
