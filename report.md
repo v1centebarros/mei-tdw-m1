@@ -5,6 +5,11 @@
 The main goal of this project is to study CI/CD pipelines and the importance of them in the development process. The project consists in a simple todo list application that store the todos inside a database which will be further explained in the next sections.
 Furthermore, there is a news page that fetches data from a CMS API and displays the news in a list.
 
+## Links
+- [Production](https://mei-tdw-m1.vercel.app/)
+- [Repository](https://gitlab.com/v1centebarros/mei-tdw-m1)
+- [SonarCloud](https://sonarcloud.io/project/overview?id=v1centebarros_mei-tdw-m1)
+
 ## Features
 
 - [x] **View Todos**: A page to view all the todos.
@@ -41,13 +46,189 @@ In this project PocketBase is used to fetch the news from the collection using t
 
 A side goal of the project was to study different tools from the ones learned in class. Thus, the project uses the following tools apart from the ones listed above:
 
-## Vitest
+### Vitest
 
 Instead of using Jest, the project uses [Vitest](https://vitest.dev/). Sveltekit uses Vite as a bundler and Vitest is a testing framework that is built on top of Vite. It is a fast and lightweight testing framework that provides a great developer experience being faster and using less resources than Jest. A main difference is that Vitest runs the tests in the browser, which allows the developer to debug the tests in the browser through an UI.
 ![VitestUI](assets/vitest-ui.png)
 
-## JSDoc
+### JSDoc
 
 SvelteKit developer team prefers the usage of JSDoc over TypeScript for documenting the code and providing type checking because of its simplicity and ease of use. JSDoc is a markup language used to annotate JavaScript source code files.
 The JSDoc works by adding comments to the code that will be parsed by type checking tools. During the development of this project JSDocs brought some problems more specifically with the DrizzleORM library, which is still in beta and has some issues with the JSDoc type checking.
 ![JSDoc](assets/jsdoc.png)
+
+### Testing Library 
+
+The Testing Library is a set of helpers that allows to test the components in a way that is closer to how the user interacts with the application. The Testing Library is used to test the components of the project and to ensure that the application is working as expected.
+
+![TestingLib](assets/testing-lib.png)
+
+### Mock Service Worker
+
+Since the application is doing REST request to make CRUD operations in the database, the Mock Service Worker is used to mock the requests and responses. This way, the tests can be run without the need of a real server running.
+![MockServiceWorker](assets/msw.png)
+
+### Husky and Lint-Staged
+
+Husky is a tool that allows to run scripts before certain git commands are executed. Lint-Staged is a tool that allows to run scripts on the files that are staged in git. This way, the code is linted and formatted before being committed to the repository. This ensures that the code is always formatted and linted and that the code style is consistent by running the ESLint and Prettier scripts before the code is committed.
+
+### Sonar Cloud
+
+Sonar Cloud is a tool that provides continuous code quality. It analyzes the code and provides insights on the code quality, security, and maintainability. It also provides code coverage reports and can be integrated with the CI/CD pipeline to ensure that the code quality is always high. Unfortunately it was not possible to use the code coverage capability because of the way SvelteKit works which code coverage tools such as v8 and istanbul are not compatible with.
+
+## CI/CD Pipeline
+
+In this project, a CI/CD pipeline was set up using GitLab CI to automate the process of installing dependencies, running tests, ensuring code quality, and deploying the application. The pipeline is organized into multiple stages to streamline development and ensure the quality of the codebase at each step. The following sections explain the key stages of the pipeline:
+
+### 1. Install Stage
+The first stage, **Install Dependencies**, ensures that all necessary project dependencies are installed using `npm ci`. This stage runs whenever there is a merge request or code pushed to the main or development branches. It caches the `node_modules` directory for faster future runs. This stage ensures that the environment is properly set up before further steps can proceed.
+
+```yaml
+install_dependencies:
+  stage: install
+  image: node:20
+  script:
+    - echo "Installing dependencies"
+    - npm ci
+  cache:
+    key: npm-cache
+    paths:
+      - node_modules/
+  only:
+    - merge_requests
+    - main
+    - dev
+    - develop
+```
+
+### 2. Test Stage
+The **Test Stage** is crucial for verifying the correctness of the code. It consists of several jobs:
+
+- **Type Checking**: Runs static type checks using the project's tools to ensure there are no type-related errors.
+
+```yaml
+run_typecheck:
+  stage: test
+  image: node:20
+  dependencies:
+    - install_dependencies
+  script:
+    - echo "Running type checks"
+    - npm run check
+  only:
+    - merge_requests
+    - main
+    - dev
+    - develop
+```
+
+- **Linting**: Ensures that the code follows the project's coding standards using linters.
+
+```yaml
+run_lint:
+  stage: test
+  image: node:20
+  dependencies:
+    - run_typecheck
+  script:
+    - echo "Running lint checks"
+    - npm run lint
+  only:
+    - merge_requests
+    - main
+    - dev
+    - develop
+```
+
+- **Testing**: Executes the project's test suite to verify that the application behaves as expected. This stage is essential to catch any issues early.
+
+```yaml
+run_tests:
+  stage: test
+  image: node:20
+  dependencies:
+    - run_lint
+  script:
+    - echo "Running tests"
+    - npm test
+  only:
+    - merge_requests
+    - main
+    - dev
+    - develop
+```
+
+### 3. SonarCloud Analysis
+To ensure code quality, the pipeline integrates with SonarCloud. This stage runs an analysis on the codebase, checking for issues related to code quality, security vulnerabilities, and code smells. The results are reported back to the development team to maintain high standards.
+
+```yaml
+sonarcloud_check:
+  stage: sonar
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+  dependencies:
+    - run_tests
+  script:
+    - echo "Running SonarCloud analysis"
+    - sonar-scanner -Dsonar.projectKey=v1centebarros_mei-tdw-m1 -Dsonar.organization=v1centebarros-gitlab
+  only:
+    - merge_requests
+    - main
+    - dev
+    - develop
+```
+
+### 4. Deploy Stage
+Finally, the pipeline includes two deployment stages:
+
+- **Preview Deployment**: Deploys the application to a preview environment using Vercel. This deployment allows developers to review the changes before they are pushed to production.
+
+```yaml
+deploy_preview:
+  stage: deploy
+  image: node:20
+  dependencies:
+    - run_tests
+  script:
+    - echo "Deploying to preview site"
+    - npm install --global vercel
+    - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+    - vercel deploy --prebuilt --token=$VERCEL_TOKEN
+  only:
+    - dev
+```
+
+- **Production Deployment**: When changes are merged into the main branch, the application is deployed to production.
+
+```yaml
+deploy_production:
+  stage: deploy
+  image: node:20
+  dependencies:
+    - run_tests
+  script:
+    - echo "Deploying to production"
+    - npm install --global vercel
+    - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+    - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+  only:
+    - main
+```
+
+
+## Screenshots
+
+### Turso Dashboard
+![Turso](assets/turso-dashboard.png)
+
+### PocketBase Dashboard
+![PocketBase](assets/pocketbase.png)
+
+### Vercel Dashboard
+![Vercel](assets/vercel.png)
+
+### SonarCloud Dashboard
+It's public and can be accessed [here](https://sonarcloud.io/project/overview?id=v1centebarros_mei-tdw-m1)
+
+### GitLab CI/CD Pipeline
+![pipeline](assets/cicd-pipeline.png)
