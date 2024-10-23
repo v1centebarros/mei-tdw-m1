@@ -1,0 +1,148 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - develop
+  pull_request:
+    branches:
+      - main
+      - dev
+      - develop
+
+jobs:
+  install_dependencies:
+    name: Install dependencies
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm ci
+        cache:
+          path: node_modules
+          key: npm-cache-${{ hashFiles('package-lock.json') }}
+
+  run_typecheck:
+    name: Run typecheck
+    runs-on: ubuntu-latest
+    needs: install_dependencies
+    strategy:
+      matrix:
+        node-version: [20]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: npm-cache-${{ hashFiles('package-lock.json') }}
+      - name: Run type checks
+        run: npm run check
+
+  run_lint:
+    name: Run lint checks
+    runs-on: ubuntu-latest
+    needs: run_typecheck
+    strategy:
+      matrix:
+        node-version: [20]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: npm-cache-${{ hashFiles('package-lock.json') }}
+      - name: Run lint checks
+        run: npm run lint
+
+  run_tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+    needs: run_lint
+    strategy:
+      matrix:
+        node-version: [20]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: npm-cache-${{ hashFiles('package-lock.json') }}
+      - name: Run tests
+        run: npm test
+
+  sonarcloud_check:
+    name: SonarCloud analysis
+    runs-on: ubuntu-latest
+    needs: run_tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@v1.5
+        with:
+          args: >
+            -Dsonar.projectKey=v1centebarros_mei-tdw-m1
+            -Dsonar.organization=v1centebarros-github
+            -Dproject.settings=sonar-project.properties
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  deploy_preview:
+    name: Deploy to preview site
+    runs-on: ubuntu-latest
+    needs: run_tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install Vercel
+        run: npm install --global vercel
+      - name: Deploy to preview
+        run: |
+          vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+          vercel build --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+    if: github.ref == 'refs/heads/dev'
+
+  deploy_production:
+    name: Deploy to production site
+    runs-on: ubuntu-latest
+    needs: run_tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install Vercel
+        run: npm install --global vercel
+      - name: Deploy to production
+        run: |
+          vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+          vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+    if: github.ref == 'refs/heads/main'
