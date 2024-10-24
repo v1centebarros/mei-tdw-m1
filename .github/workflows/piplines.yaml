@@ -110,7 +110,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=v1centebarros_mei-tdw-m1
-            -Dsonar.organization=v1centebarros-github
+            -Dsonar.organization=v1centebarros-gitlab
             -Dproject.settings=sonar-project.properties
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
