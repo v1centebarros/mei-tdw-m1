@@ -20,19 +20,21 @@ This project is a web application built using Svelte, JavaScript, and TypeScript
 ## Installation
 
 1. Clone the repository:
-    ```sh
-    git clone https://github.com/v1centebarros/mei-tdw-m1.git
-    cd mei-tdw-m1
-    ```
+
+   ```sh
+   git clone https://github.com/v1centebarros/mei-tdw-m1.git
+   cd mei-tdw-m1
+   ```
 
 2. Install dependencies:
-    ```sh
-    npm install
-    ```
+   ```sh
+   npm install
+   ```
 
 ## Running the Application
 
 To start the development server, run:
+
 ```sh
 npm run dev
 ```
@@ -40,6 +42,7 @@ npm run dev
 ## Running Tests
 
 To run the tests, use:
+
 ```sh
 npm test
 ```
@@ -58,6 +61,7 @@ The project is integrated with SonarCloud for code quality analysis. The configu
 ## License
 
 This project is licensed under the MIT License.
+
 ```
 
 ## Contributing
@@ -67,3 +71,4 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 ## Contact
 
 For any inquiries, please contact [v1centebarros](https://github.com/v1centebarros).
+```
