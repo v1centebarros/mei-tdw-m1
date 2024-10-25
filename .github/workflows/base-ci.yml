@@ -104,7 +104,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@v4
+        uses: sonarsource/sonarcloud-github-action@v1.5
         with:
           args: >
             -Dsonar.projectKey=${{ inputs.sonar_project_key }}
