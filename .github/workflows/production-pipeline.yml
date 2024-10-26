@@ -13,6 +13,9 @@ jobs:
     with:
       sonar_project_key: v1centebarros_mei-tdw-m1
       sonar_organization: v1centebarros-github
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      PUBLIC_POCKETBASE_URL: ${{ secrets.PUBLIC_POCKET_URL }}
 
   deploy_production:
     name: Deploy to production site
