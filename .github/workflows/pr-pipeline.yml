@@ -13,3 +13,4 @@ jobs:
     with:
       sonar_project_key: v1centebarros_mei-tdw-m1
       sonar_organization: v1centebarros-github
+    secrets: inherit
