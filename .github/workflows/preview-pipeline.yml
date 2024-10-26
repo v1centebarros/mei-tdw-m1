@@ -20,14 +20,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Set up Node.js 18
-        uses: actions/setup-node@v3
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      - name: Install Vercel
-        run: npm install --global vercel
+          node-version: '20'
       - name: Deploy to preview
         run: |
+          npm install --global vercel
           vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
           vercel build --token=${{ secrets.VERCEL_TOKEN }}
           vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
