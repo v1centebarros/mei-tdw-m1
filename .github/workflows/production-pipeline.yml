@@ -21,15 +21,14 @@ jobs:
     needs: production_pipeline
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Install Vercel
+        uses: actions/checkout@v4
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
-        run: npm install --global vercel
+          node-version: '20'
       - name: Deploy to production
-        with:
-          node-version: 18
         run: |
+          npm install --global vercel
           vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
           vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
           vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
