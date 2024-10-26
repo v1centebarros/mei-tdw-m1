@@ -21,7 +21,7 @@ jobs:
     needs: production_pipeline
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: Install Vercel
         run: npm install --global vercel
       - name: Deploy to production
