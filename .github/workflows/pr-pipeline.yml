@@ -1,0 +1,16 @@
+name: Pull Request CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+      - develop
+
+jobs:
+  pr_pipeline:
+    uses: ./.github/workflows/base-ci.yml
+    with:
+      sonar_project_key: v1centebarros_mei-tdw-m1
+      sonar_organization: v1centebarros-gitlab
+    secrets: inherit

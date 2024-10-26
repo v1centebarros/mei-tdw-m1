@@ -64,7 +64,10 @@
 					<input
 						type="checkbox"
 						checked={!!todo.completed}
-						on:change={(e) => updateTodoStatus(todo.id, e.target.checked)}
+						on:click={(e) => {
+							const target = /** @type {HTMLInputElement} */ (e.target);
+							updateTodoStatus(todo.id, target.checked);
+						}}
 						class="checkbox-accent checkbox"
 					/>
 					<span class={`text-xl font-light ${todo.completed && 'line-through'}`}>{todo.title}</span>
@@ -106,6 +109,6 @@
 		class={`btn join-item bg-gradient-to-r from-orange-600 from-10% via-pink-800 via-40% to-purple-800 to-90% text-white disabled:text-white ${!inputTodo && 'btn-disabled'}`}
 		on:click={async () => await addTodo(inputTodo)}
 		disabled={!inputTodo}
-	>Add Todo
+		>Add Todo
 	</button>
 </div>
