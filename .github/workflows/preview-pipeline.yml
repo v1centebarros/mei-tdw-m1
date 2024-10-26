@@ -19,14 +19,14 @@ jobs:
     needs: preview_pipeline
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Install Vercel
+        uses: actions/checkout@v4
+      - name: Set up Node.js 18
+        uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: '18'
+      - name: Install Vercel
         run: npm install --global vercel
       - name: Deploy to preview
-        with:
-          node-version: 18
         run: |
           vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
           vercel build --token=${{ secrets.VERCEL_TOKEN }}
