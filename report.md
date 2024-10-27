@@ -66,6 +66,9 @@ Pocketbase is a powerful CMS with its toolkit simplified the calls without the n
 
 A side goal of the project was to study different tools from the ones learned in class.
 The main development platform was Gitlab since it was not used during classes. Gitlab provided a simpler approach than Github. 
+
+The key difference of Gitlab was the way it was organised where the CI/CD features in a different section helping the work from the DevOps. On Github the CI/CD, permissions and deployment is more hidden. However, Github have a better way to organise the CI/CD files inside the .github folder than Gitlab which places everything inside the same file .gitlab-ci.yml. 
+
 Thus, the project uses the following tools apart from the ones listed bellow:
 
 ### Vitest
@@ -87,7 +90,7 @@ The Testing Library is a set of helpers that allows to test the components in a 
 
 ### Mock Service Worker
 
-Since the application is doing REST request to make CRUD operations in the database, the Mock Service Worker is used to mock the requests and responses. This way, the tests can be run without the need of a real server running.
+Since the application is doing REST request to make CRUD operations in the database, the Mock Service Worker is used to mock the requests and responses. This way, the tests can be run without the need of a real server running. 
 ![MockServiceWorker](assets/msw.png)
 
 ### Husky and Lint-Staged
@@ -100,7 +103,7 @@ Sonar Cloud is a tool that provides continuous code quality. It analyzes the cod
 
 ## CI/CD Pipeline
 
-In this project, a CI/CD pipeline was set up using GitLab CI to automate the process of installing dependencies, running tests, ensuring code quality, and deploying the application. The pipeline is organized into multiple stages to streamline development and ensure the quality of the codebase at each step. The following sections explain the key stages of the pipeline:
+In this project, a CI/CD pipeline was set up using GitLab CI to automate the process of installing dependencies, running tests, ensuring code quality, and deploying the application. The pipeline is organized into multiple stages to streamline development and ensure the quality of the codebase at each step. The following sections explain the key stages of the pipeline.
 
 ### 1. Install Stage
 The first stage, **Install Dependencies**, ensures that all necessary project dependencies are installed using `npm ci`. This stage runs whenever there is a merge request or code pushed to the main or development branches. It caches the `node_modules` directory for faster future runs. This stage ensures that the environment is properly set up before further steps can proceed.
@@ -236,6 +239,231 @@ deploy_production:
   only:
     - main
 ```
+
+**Github Actions**: 
+
+Base action: 
+```yaml
+name: Base CI Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      sonar_project_key:
+        required: true
+        type: string
+      sonar_organization:
+        required: true
+        type: string
+
+jobs:
+  install_dependencies:
+    name: Install dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: npm-cache-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-cache-
+      - name: Install dependencies
+        run: npm ci
+
+  run_typecheck:
+    name: Run typecheck
+    runs-on: ubuntu-latest
+    needs: install_dependencies
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: npm-cache-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-cache-
+      - name: Run type checks
+        run: npm run check
+        env:
+          PUBLIC_POCKETBASE_URL: ${{ secrets.PUBLIC_POCKETBASE_URL }}
+
+  run_lint:
+    name: Run lint checks
+    runs-on: ubuntu-latest
+    needs: install_dependencies
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: npm-cache-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-cache-
+      - name: Run lint checks
+        run: npm run lint
+
+  run_tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+    needs: install_dependencies
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: npm-cache-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-cache-
+      - name: Run tests
+        run: npm test
+
+  sonarcloud_check:
+    name: SonarCloud analysis
+    runs-on: ubuntu-latest
+    needs: [run_tests, run_lint, run_typecheck]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        with:
+          args: >
+            -Dsonar.projectKey=${{ inputs.sonar_project_key }}
+            -Dsonar.organization=${{ inputs.sonar_organization }}
+            -Dproject.settings=sonar-project.properties
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+```
+
+PR Pipeline:
+```yaml
+name: Pull Request CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+      - develop
+
+jobs:
+  pr_pipeline:
+    uses: ./.github/workflows/base-ci.yml
+    with:
+      sonar_project_key: v1centebarros_mei-tdw-m1
+      sonar_organization: v1centebarros-gitlab
+    secrets: inherit
+```
+
+Preview Pipeline:
+```yaml
+name: Preview CI Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  preview_pipeline:
+    uses: ./.github/workflows/base-ci.yml
+    with:
+      sonar_project_key: v1centebarros_mei-tdw-m1
+      sonar_organization: v1centebarros-gitlab
+    secrets: inherit
+
+  deploy_preview:
+    name: Deploy to preview site
+    runs-on: ubuntu-latest
+    needs: preview_pipeline
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Deploy to preview
+        run: |
+          npm install --global vercel
+          vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+          vercel build --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+```
+
+Production Pipeline:
+```yaml
+name: Production CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  production_pipeline:
+    uses: ./.github/workflows/base-ci.yml
+    with:
+      sonar_project_key: v1centebarros_mei-tdw-m1
+      sonar_organization: v1centebarros-gitlab
+    secrets: inherit
+
+  deploy_production:
+    name: Deploy to production site
+    runs-on: ubuntu-latest
+    needs: production_pipeline
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Deploy to production
+        run: |
+          npm install --global vercel
+          vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+          vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+```
+
+### Recurring Deployment
+The assignment needed the production deployment to run every day at 00:00. Highlighting the simplicity of Gitlab, the only task needed was to define on Gitlab a scheduled pipeline without changing anything on the pipelines. On GitHub it was needed to add a CRON job on the production pipeline to make it work.
+
+### Key Differences with GitHub
+GitHub, as was expected some differences further than the syntax. On Gitlab we define a base image and all the commands are executed inside the same image. However, the GitHub actions are step oriented where each step can have a different action running with different tasks. A interesting feature is the capability of import self-made actions to another actions. In this case, the base pipeline which consists the installation, testing and linting is imported in the preview and production. 
+
+
+## Conclusions
+
+This project helped to develop not only the CI/CD skills but also improve the knowledge on frontend development. The usage of bleeding-edge technologies such as DrizzleORM and Turso was a good experience to understand the challenges of using new technologies. The SvelteKit framework was a good experience to understand the differences between React and Svelte and how the SvelteKit can be a good alternative to React. The CI/CD pipeline was a good experience to understand the importance of automating the development process and ensuring the quality of the codebase. The integration with SonarCloud was a good experience to understand how to maintain high code quality standards.
 
 
 ## Screenshots
