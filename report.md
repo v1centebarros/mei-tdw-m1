@@ -7,7 +7,8 @@ Furthermore, there is a news page that fetches data from a CMS API and displays 
 
 ## Links
 - [Production](https://mei-tdw-m1.vercel.app/)
-- [Repository](https://gitlab.com/v1centebarros/mei-tdw-m1)
+- [Gitlab Repository](https://gitlab.com/v1centebarros/mei-tdw-m1)
+- [Gitub Repository](https://github.com/v1centebarros/mei-tdw-m1)
 - [SonarCloud](https://sonarcloud.io/project/overview?id=v1centebarros_mei-tdw-m1)
 
 ## Features
@@ -26,25 +27,46 @@ This project was thought to use different technologies from the ones used in cla
 ### SvelteKit
 
 [SvelteKit](https://kit.svelte.dev/) is a framework for building web applications with Svelte. It is a powerful tool that allows developers to create applications with ease and speed. SvelteKit provides a great developer experience and is highly performant.
-The SvelteKit can work as frontend and backend, due to the server-side rendering feature. All the business logic of the TODO app is possible with SvelteKit while the News is fetched from a CMS API which will be explained in the next sections.
+The SvelteKit can work as frontend and backend, due to the server-side rendering feature. All the business logic of the TODO app is possible with SvelteKit while the News is fetched from a CMS API which will be explained in the next sections. 
+The first challenge of using this framework while using svelte was the different approach from React. 
+
+Svelte compiles components to efficient imperative code that directly manipulates the DOM, while React uses a virtual DOM to batch updates and optimize rendering. Svelte is generally faster due to its compilation step, which eliminates the overhead of a virtual DOM, whereas React is slightly slower due to the virtual DOM diffing process. Svelte manages state within components using reactive assignments, while React uses hooks (e.g., useState, useReducer) and external libraries (e.g., Redux) for state management. 
+Svelte is easier to learn for beginners due to its simpler syntax and less boilerplate, whereas React has a steeper learning curve due to the need to understand JSX, hooks, and the virtual DOM. Svelte uses a more HTML-like syntax with \<script\> tags to handle the logic part of the component, while React uses JSX, which mixes HTML with JavaScript. Svelte has a built-in reactivity system that automatically updates the DOM when state changes, whereas React requires explicit state updates and re-renders using hooks.
+
+The development of the application started by the development of the Todo Application. The routes were seperated between the Todo, api and news. The todo folder needed the parenthesis between to do not use the path /todos as route and use the root route instead. Afterwards, the api folder is where the REST apis is located with the CRUD endpoints of the todos. Finally, the news route is responsible to display and fetch the data from the CMS.
+
+Each page generally consisted in two files `+page.server.js` `+page.svelte`. SvelteKit is server-side render firstly and the `+page.server.js` is responsible to fetch the data from the database and prepare to serve. Then `+page.svelte` will pick the information and display and provide a way to the user interact with it.
+
+Concluding, Svelte proved to be a simple yet powerful frontend framework giving an easy-going experience when developing the application and was a good to leave the React Eco-system.
 
 ### DrizzleORM
 
 [DrizzleORM](https://orm.drizzle.team/) is an Object-Relational Mapping (ORM) library which provides a simples way to interact with databases. The interaction with the Todo database is done through DrizzleORM simplifying the process of creating, reading, updating and deleting data through migrations and models.
 
+The key difference from Drizzle to other ORMs is the SQL-like syntax which makes the developer experience more interesting and more close to the database.
+
+DrizzleORM was a good experience when developing, but since is a bleeding-edge technology some integrations, mainly in the typechecking was particular difficult. The Drizzle Studio was a good tool to use and in large projects can be helpful. 
+
 ### Turso
 
 [Turso](https://turso.tech/) is a distributed, edge-hosted SQL database designed to provide low-latency data access by running closer to end-users geographically. Turso builds upon libSQL, an open-source and cloud-native fork of SQLite, to offer a developer-friendly and scalable database solution for modern applications.
-For this project, Turso is used to store the todos created by the user.
+For this project, Turso is used to store the todos created by the user and to create a production and preview. The first step to start using Turso was to select a region where the databases will be stored, since we wanted to use the Free tier only one location was selected but Turso offers the capability to have data redundancy across different locations. 
+
+Since Turso is one of the main sponsors of Drizzle, the integration turned to be smoothly since the only difference between SQLite and Turso was the driver to use. 
 
 ### PocketBase
 [PocketBase](https://pocketbase.io/) is an open-source backend framework designed to simplify and accelerate the development of modern applications. Written in the Go programming language, PocketBase provides a self-contained, portable backend solution that includes a real-time database, user authentication and authorization, file storage, and an admin dashboard—all accessible through a RESTful API.
 In this project PocketBase is used to fetch the news from the collection using the PocketBase toolkit while hosted in [pockethost.io](https://pockethost.io).
 
+The first step was to define the news collection type with the specific fields. One key field is the content field which allows the insertion of html to be rendered in the frontend. Svelte provides a @html tag to that matter.
+
+Pocketbase is a powerful CMS with its toolkit simplified the calls without the need of using the REST api.
 
 # CI/CD Tools
 
-A side goal of the project was to study different tools from the ones learned in class. Thus, the project uses the following tools apart from the ones listed above:
+A side goal of the project was to study different tools from the ones learned in class.
+The main development platform was Gitlab since it was not used during classes. Gitlab provided a simpler approach than Github. 
+Thus, the project uses the following tools apart from the ones listed bellow:
 
 ### Vitest
 
