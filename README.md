@@ -47,6 +47,12 @@ To run the tests, use:
 npm test
 ```
 
+## Running Type Checking
+
+```shell
+npm run check
+```
+
 ## Continuous Integration
 
 The project uses GitLab CI for continuous integration. The configuration is defined in the `.gitlab-ci.yml` file. It includes the following jobs:
@@ -62,13 +68,10 @@ The project is integrated with SonarCloud for code quality analysis. The configu
 
 This project is licensed under the MIT License.
 
-```
-
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any changes.
 
 ## Contact
 
-For any inquiries, please contact [v1centebarros](https://github.com/v1centebarros).
-```
+For any inquiries, please contact [v1centebarros](https://gitlab.com/v1centebarros).
